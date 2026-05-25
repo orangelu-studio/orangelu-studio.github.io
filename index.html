@@ -10,7 +10,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>" />
     <link rel="manifest" href="manifest.json" />
     <title>江屿给橙子的小家</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260525-interaction-scroll" />
   </head>
   <body>
     <!-- 进门密码 -->
@@ -314,7 +314,7 @@
           </section>
 
           <button type="button" class="ghost-button" id="editSetup" title="修改入住设定（名称、图像、API等）">修改入住设定</button>
-          <button type="button" class="ghost-button" id="manualSave" title="Save to this browser">💾 手动存档</button>
+          <button type="button" class="ghost-button" id="manualSave" title="保存到当前浏览器">💾 手动存档</button>
         </aside>
 
         <!-- 中间主区域 -->
@@ -329,6 +329,7 @@
               <button type="button" id="noteButton" title="聊天小纸条" class="glow-button">📝 小纸条</button>
               <button type="button" id="updateLibraryBtn" class="library-inline-button" title="如果最近总撞到重复内容，可以连上 API 后换一批新的。">更新语库</button>
             </span>
+            <button type="button" id="mobileSetupButton" class="mobile-setup-button" title="打开设定、API连接和图片上传">设置 / API / 图片</button>
           </header>
 
           <nav class="room-tabs" aria-label="房间">
@@ -573,10 +574,10 @@
       </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20260525-interaction-scroll"></script>
     <script>
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js").then((registration) => {
+        navigator.serviceWorker.register("sw.js?v=20260525-interaction-scroll").then((registration) => {
           registration.update();
           if (registration.waiting) registration.waiting.postMessage("SKIP_WAITING");
         });

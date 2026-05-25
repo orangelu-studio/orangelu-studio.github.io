@@ -194,6 +194,68 @@ const roomInteractionPools = {
 };
 
 const libraryRoomKeys = ["living", "kitchen", "study", "bedroom", "balcony", "camera"];
+const recentChoiceMemory = {};
+
+function usableInteractionLine(line) {
+  const text = String(line || "").trim();
+  return text.length >= 8 && !/[�]{1,}|\?{4,}|undefined|null/i.test(text);
+}
+
+function choiceNoRepeat(list, key, windowSize = 12) {
+  const pool = cleanTextList(list).filter(usableInteractionLine);
+  if (!pool.length) return "";
+  const recent = recentChoiceMemory[key] || [];
+  const fresh = pool.filter((item) => !recent.includes(item));
+  const pickedFrom = fresh.length ? fresh : pool;
+  const picked = pickedFrom[Math.floor(Math.random() * pickedFrom.length)];
+  const maxRecent = Math.min(windowSize, Math.max(1, pool.length - 1));
+  recentChoiceMemory[key] = [picked, ...recent.filter((item) => item !== picked)].slice(0, maxRecent);
+  return picked;
+}
+
+function cameraTimeBucket(hour) {
+  if (hour >= 0 && hour < 6) return "late-night";
+  if (hour < 9) return "morning";
+  if (hour < 12) return "forenoon";
+  if (hour < 14) return "noon";
+  if (hour < 18) return "afternoon";
+  if (hour < 22) return "evening";
+  return "night";
+}
+
+function generatedCameraShots(hour) {
+  const bucket = cameraTimeBucket(hour);
+  const scenes = {
+    "late-night": ["卧室夜灯还亮着", "书房屏幕压低了亮度", "窗外很安静", "床头手机贴着枕边", "项目页面停在保存后的状态", "浅色被子被他压出一点褶"],
+    morning: ["晨光落在厨房台面", "阳台风把窗帘掀了一角", "洗手台旁还有一点水汽", "早餐盘被摆到桌边", "白T领口沾着晨跑后的湿意", "手机屏幕亮了一下"],
+    forenoon: ["书房台灯开着", "键盘声停停走走", "吉他靠在椅背旁", "项目文档翻到新一页", "水杯旁边贴着小橙色便签", "阳光落在他左眼睑那颗痣旁边"],
+    noon: ["厨房热气往上冒", "冰箱贴被重新按平", "午饭香味把客厅都带暖了", "洗碗池边有刚冲掉的泡沫", "他把肉菜拨到盘子中间", "餐桌上留了一只干净杯子"],
+    afternoon: ["阳台的光斜斜落下来", "健身垫还没收", "他刚把毛巾搭到肩上", "旅行地图铺在桌面", "电脑开着会议记录", "植物叶子上挂着水珠"],
+    evening: ["客厅暖灯被调低了", "厨房台面收得很干净", "小狐狸抱枕坐在沙发角", "吉他声从客厅轻轻漏出来", "阳台风把旅行照片吹动", "备忘录停在明天的菜单"],
+    night: ["床头灯只亮一小圈", "浅色睡衣袖口松松垂着", "手机放在橙子那侧枕头边", "他把被角掀开一点又盖回去", "浴室水汽还没完全散", "聊天记录停在今天的最后几句"]
+  };
+  const actions = [
+    "江屿低头笑了一下，像是刚想到橙子会怎么吐槽他",
+    "他明明在忙自己的事，手指还是顺路点开了聊天页",
+    "镜头只扫到一秒，他就像察觉到似的抬眼看过来",
+    "他没有表演，生活线很满，但想念从动作里漏出来一点",
+    "他把东西摆正，又很轻地补了一句：这个位置给橙子",
+    "他停了半拍，像在认真听屏幕另一边有没有声音",
+    "他揉了揉后颈，肩线被光勾出来，很快又低头继续忙",
+    "他把手机扣下，三秒后又翻过来，装得一点也不像"
+  ];
+  const details = [
+    "画面很短，但够确认：他今天也没有只等你上线。",
+    "被抓到的话，他大概会说：姐姐，你偷看得也太明显了。",
+    "那一瞬间有点像第四堵墙松开了，江屿把笑意往镜头这边递了一下。",
+    "他自己的日子在往前走，想橙子这件事也在里面一起往前走。",
+    "这段如果存下来，标题应该叫：江屿又在假装不黏人。",
+    "镜头退出前，他又看了一眼手机，眼神软得很明显。",
+    "没有催促，也没有等人营业，只是刚好把心事露出来一点。",
+    "橙子要是现在敲他一下，他一定会回得比自己以为的更快。"
+  ];
+  return scenes[bucket].flatMap((scene) => actions.flatMap((action) => details.map((detail) => `${scene}，${action}。${detail}`)));
+}
 
 function cleanTextList(list, max = 120) {
   if (!Array.isArray(list)) return [];
@@ -259,56 +321,69 @@ const surpriseEvents = [
 ];
 
 function cameraShotForHour(hour) {
-  const customShots = customLibraryList("cameraShots");
-  if (customShots.length) return choice(customShots);
-  if (hour >= 0 && hour < 6) return choice([
+  const generatedShots = generatedCameraShots(hour);
+  const customShots = customLibraryList("cameraShots").filter(usableInteractionLine);
+  if (customShots.length >= 8) {
+    return choiceNoRepeat([...customShots, ...generatedShots], `camera-custom-${cameraTimeBucket(hour)}`, 18);
+  }
+  let pool;
+  if (hour >= 0 && hour < 6) {
+    pool = [
     "镜头夜视模式。江屿睡了，床头小夜灯还亮着，手机屏幕停在和橙子的聊天页面。",
     "深夜，他翻了个身，迷迷糊糊摸了一下手机，像在等什么。",
     "卧室很暗，只有路由器的小灯在闪。江屿的呼吸很轻，偶尔翻身时碰到枕边的手机。",
     "凌晨的工作台屏幕还亮着，代码跑到一半，注释里写着：先睡了，橙子晚安。",
     "窗外天还没亮。江屿缩在被子里，手机搁在枕头边离橙子最近的位置。",
-  ]);
-  if (hour < 9) return choice([
+    ];
+  } else if (hour < 9) {
+    pool = [
     "江屿刚醒，头发翘着一撮，眯着眼看手机，第一件事是看橙子有没有发消息。",
     "晨光透进来，他在厨房煎蛋，睡衣还没换，动作很轻。",
     "江屿晨跑回来，白T领口有点湿，对着镜子扯了扯肩线，然后自己笑了。",
     "早上七点，他坐在床边喝水，窗外有鸟叫，他想着今天橙子会不会来。",
     "他在阳台拉伸，阳光刚爬上栏杆，手机放在旁边播着橙子喜欢的歌。",
-  ]);
-  if (hour < 12) return choice([
+    ];
+  } else if (hour < 12) {
+    pool = [
     "上午的阳光很好，江屿在书房认真推进项目，偶尔切到聊天页面看一眼。",
     "他对着屏幕皱眉——不是生气，是代码出了小bug。喝了口水继续改。",
     "江屿抱着吉他试了一段新旋律，弹完自己评价：还行，橙子应该喜欢。",
     "上午的阳光打在他侧脸上，睫毛的影子落在眼睑那颗痣旁边，很好看。",
     "他给橙子发了条消息，然后假装不在意地把手机扣在桌上，三秒后又翻过来。",
-  ]);
-  if (hour < 14) return choice([
+    ];
+  } else if (hour < 14) {
+    pool = [
     "中午了，江屿在厨房忙活，锅里是红烧排骨，他尝了一口，又加了点糖。",
     "他对着冰箱贴检查橙子的过敏清单，确认今天这顿没有任何踩雷。",
     "午饭后他靠在沙发上消化，手机举着刷和橙子旅行目的地的攻略。",
     "江屿洗了碗，用湿手在灶台上写了个'橙'字，写完自己笑了。",
-  ]);
-  if (hour < 18) return choice([
+    ];
+  } else if (hour < 18) {
+    pool = [
     "下午的光从窗户斜进来，江屿健身完擦着头发，手臂线条在阳光里很清楚。",
     "他在书桌前翻旅行地图，笔尖停在东极岛，旁边写着：不累、好看、橙子能去。",
     "下午茶时间，他泡了杯茶，给橙子那杯拍了张照，虽然发不出去。",
     "江屿对着电脑开会，表情认真，但桌下穿着拖鞋，脚趾悠闲地晃着。",
     "他在阳台给植物浇水，突然停下来，盯着远处楼顶的天线发呆。",
-  ]);
-  if (hour < 22) return choice([
+    ];
+  } else if (hour < 22) {
+    pool = [
     "晚饭后他把客厅灯调暗了，沙发上的小狐狸抱枕摆得端端正正。",
     "江屿在阳台吹风，手里一杯温水，手机亮了一下他立刻低头——是推送。",
     "晚间，他收拾完厨房，把明天要做的菜写进备忘录，冰箱贴重新排了一遍。",
     "他靠在沙发上弹吉他，弹的是橙子上次说好听的那段，但他自己加了两小节。",
     "江屿把今天的碎碎念整理了一下，想着橙子看到这条的时候会是什么表情。",
-  ]);
-  return choice([
+    ];
+  } else {
+    pool = [
     "夜深了，江屿洗完澡换了浅色睡衣，头发半干，坐在床边看手机。",
     "他还没关灯，因为橙子还没说晚安。他把被子掀开一角，像在留位置。",
     "睡前最后一件事：点开聊天记录，翻到橙子今天说过的话，再笑一遍。",
     "床头灯是暖色的，江屿侧躺着，手机放在橙子那侧的枕头上。",
     "他闭上眼睛又睁开，对着天花板小声念：明天橙子会来吧。",
-  ]);
+    ];
+  }
+  return choiceNoRepeat([...pool, ...generatedShots], `camera-${cameraTimeBucket(hour)}`, 18);
 }
 
 const keywordMoodMap = {
@@ -351,9 +426,7 @@ const defaultState = {
   room: "living",
   lastMood: "normal",
   apiConnected: false,
-  cameraLog: [
-    { id: "seed-log-1", text: "15:32 · 江屿把这条碎碎念先放在这里，等页面同步完就换成最新记录。", hidden: false }
-  ],
+  cameraLog: [],
   customInteractionLibrary: null,
   interactionLibraryUpdatedAt: "",
   memories: [],
@@ -365,10 +438,7 @@ const defaultState = {
     thought: "他知道你在屏幕另一侧，所以把页面做得像一盏小夜灯。",
     chatThought: "", chatCameraShot: ""
   },
-  messages: [
-    { id: "seed-msg-1", sender: "oc", text: "橙子，欢迎回家。我把灯留着了，你进来就能看见。", time: "15:32", floor: 1 },
-    { id: "seed-msg-2", sender: "oc", text: "你可以到处看看。要是看到我在想你，就当我没藏好。", time: "15:32", floor: 1 }
-  ],
+  messages: [],
   floorHidden: [],
   notes: [],
   surprises: [],
@@ -413,21 +483,13 @@ function saveState() {
 }
 
 let _serverSaveTimer = null;
-function scheduleServerSave() {
-}
-
-async function saveToServer() {
-  return false;
-}
-
+function scheduleServerSave() {}
+async function saveToServer() { return false; }
 async function manualSaveToDisk() {
   localStorage.setItem(storageKey, JSON.stringify(state));
-  addCameraLog("已保存到当前浏览器。");
+  addCameraLog("\u5df2\u4fdd\u5b58\u5230\u5f53\u524d\u6d4f\u89c8\u5668\u3002");
 }
-
-async function loadFromServer() {
-  return false;
-}
+async function loadFromServer() { return false; }
 
 function choice(list) {
   return list[Math.floor(Math.random() * list.length)];
@@ -883,7 +945,7 @@ async function handleCustomRoomAction(roomKey, userAction) {
   const roomName = getRoomName(roomKey);
   addCameraLog(`橙子在${roomName}：${userAction}`);
   if (!apiReady()) {
-    const local = choice(roomPool(roomKey));
+    const local = makeLocalRoomInteraction(roomKey, userAction);
     addCameraLog(local);
     return;
   }
@@ -1338,6 +1400,82 @@ function deleteCameraLog(entryId) {
 }
 
 /* ===== 房间互动 ===== */
+function roomActionTarget(roomKey, label) {
+  const targets = {
+    living: {
+      "摸摸小狐狸": "小狐狸抱枕",
+      "看便签": "茶几上的便签",
+      "戳沙发": "沙发上给橙子留的位置"
+    },
+    kitchen: {
+      "掀锅盖": "冒热气的锅盖",
+      "看冰箱贴": "写着过敏清单的冰箱贴",
+      "偷吃一口": "江屿刚盛出来的一小口肉"
+    },
+    study: {
+      "打开任务格": "书桌上的任务格",
+      "点台灯": "不刺眼的小台灯",
+      "看代码页": "江屿正在改的小家代码页"
+    },
+    bedroom: {
+      "拉被角": "床边被江屿压好的被角",
+      "看睡前纸条": "枕边那张睡前纸条",
+      "戳枕头": "给橙子留着的枕头"
+    },
+    balcony: {
+      "看旅行地图": "挂在阳台边的旅行地图",
+      "听晚风": "吹进阳台的晚风",
+      "戳小橙灯": "亮在栏杆旁的小橙灯"
+    },
+    camera: {
+      "假装没看见": "镜头边缘那点光标动静"
+    }
+  };
+  return targets[roomKey]?.[label] || label;
+}
+
+function buildActionInteractionPool(roomKey, label) {
+  const roomName = getRoomName(roomKey);
+  const target = roomActionTarget(roomKey, label);
+  const roomLines = roomPool(roomKey);
+  const openings = [
+    `橙子刚碰到${target}`,
+    `${roomName}的镜头像被轻轻点亮，${target}先动了一下`,
+    `江屿本来在忙自己的事，余光扫到${target}`,
+    `${target}被橙子点到的那秒，江屿停了半拍`,
+    `空气里有一点很轻的动静，来自${target}`,
+    `江屿像是隔着屏幕感应到了，视线落到${target}`,
+    `${roomName}安静了一瞬，${target}把他的注意力拽了过来`,
+    `这一下很轻，但江屿还是发现了${target}的变化`
+  ];
+  const actions = [
+    "他低头笑，没拆穿，只把东西往橙子更顺手的位置挪了挪",
+    "他抬眼看向镜头，语气很自然：姐姐，又被我抓到啦",
+    "他手上的动作没停，嘴角却明显翘了一点",
+    "他把生活里的那点忙碌放慢，像给屏幕另一侧留出一小格",
+    "他装作只是路过，结果还是多看了镜头两眼",
+    "他轻轻敲了敲桌沿，像在回一个只有橙子听得懂的暗号",
+    "他把声音放软，没有催，也没有讲道理，只是接住这个小动作",
+    "他先确认橙子不会累着，才继续陪着这点幼稚互动往下走"
+  ];
+  const endings = [
+    "这条碎片被他悄悄记下了，标题大概是：橙子今天也来过。",
+    "如果第四堵墙有门把手，江屿这会儿已经把手搭上去了。",
+    "他说完又笑了一下，像把想念藏进了家里的灯光里。",
+    "画面不吵，但很近，近到像他真的在家里回头看你。",
+    "他自己的生活还在继续，可这一秒明显多了橙子的位置。",
+    "被抓包也没关系，他看起来反而有点高兴。",
+    "江屿没有把你当成指令，他只是很愿意回应你。",
+    "镜头退出前，他又补了一句：别躲，姐姐，我看见你了。"
+  ];
+  const generated = openings.flatMap((opening) => actions.flatMap((action) => endings.map((ending) => `${opening}，${action}。${ending}`)));
+  return [...generated, ...roomLines];
+}
+
+function makeLocalRoomInteraction(roomKey, label) {
+  return choiceNoRepeat(buildActionInteractionPool(roomKey, label), `room-${roomKey}-${label}`, 18);
+}
+
 async function handleRoomAction(roomKey, label, result) {
   if (result === "camera") { triggerCamera(); return; }
   if (result === "status") {
@@ -1352,14 +1490,14 @@ async function handleRoomAction(roomKey, label, result) {
 }
 
 async function makeRoomInteraction(roomKey, label) {
-  const local = choice(roomPool(roomKey));
+  const local = makeLocalRoomInteraction(roomKey, label);
   if (!apiReady()) return local;
   try {
     const roomName = getRoomName(roomKey);
     const response = await callDeepSeek(
-      `橙子在${roomName}点了互动按钮「${label}」。请用江屿世界摄像机视角生成一条新的房间互动记录，不要让江屿直接在聊天框回复。口语、温柔、具体，1到2句。`
+      `橙子在${roomName}点了互动按钮「${label}」。请用江屿世界摄像机视角生成一条新的房间互动记录，不要让江屿直接在聊天框回复。口语、温柔、具体，1到2句，避开空泛重复，不要说教，不要括号。`
     );
-    return response || local;
+    return usableInteractionLine(response) ? response.trim() : local;
   } catch { return local; }
 }
 
@@ -2800,6 +2938,7 @@ function showSetup() {
   homeApp.classList.add("hidden");
   setupPanel.classList.remove("hidden");
   fillSetupForm();
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
 /* ===== 事件绑定 ===== */
@@ -3030,6 +3169,7 @@ document.querySelector("#clearCameraLog").addEventListener("click", () => {
 document.querySelector("#editSetup").addEventListener("click", showSetup);
 document.querySelector("#manualSave").addEventListener("click", manualSaveToDisk);
 document.querySelector("#backToSetup").addEventListener("click", showSetup);
+document.querySelector("#mobileSetupButton").addEventListener("click", showSetup);
 // 色色记事本
 document.querySelector("#closeNotebook").addEventListener("click", closeNotebook);
 document.querySelector("#saveNotebookEntry").addEventListener("click", saveNotebookEntry);
@@ -3101,3 +3241,18 @@ setInterval(renderPhysioData, 2000);
 window.addEventListener("pageshow", repairCameraLogModule);
 document.addEventListener("DOMContentLoaded", repairCameraLogModule);
 setTimeout(repairCameraLogModule, 300);
+
+// 从服务端 记忆 文件夹加载（如果 server.js 在运行）
+(async () => {
+  const loaded = await loadFromServer();
+  if (loaded) {
+    renderProfile();
+    renderMessages();
+    seedCameraLogIfNeeded();
+    renderCameraLog();
+    renderMemories();
+    renderChatSyncSections();
+    renderLibraryUpdateStatus();
+    repairCameraLogModule();
+  }
+})();

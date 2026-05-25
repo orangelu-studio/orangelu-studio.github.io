@@ -1,4 +1,4 @@
-const CACHE = "jy-home-gh-pages-v1";
+const CACHE = "jy-home-gh-pages-v6";
 const FILES = ["./", "./index.html", "./style.css", "./script.js", "./manifest.json"];
 
 self.addEventListener("install", (event) => {

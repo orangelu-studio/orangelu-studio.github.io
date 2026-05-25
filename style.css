@@ -18,6 +18,12 @@ button { transition: transform 0.1s; }
 
 * { box-sizing: border-box; }
 
+html {
+  min-height: 100%;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -27,6 +33,35 @@ body {
     linear-gradient(135deg, rgba(216, 116, 63, 0.12), transparent 38%),
     linear-gradient(225deg, rgba(111, 156, 114, 0.16), transparent 36%),
     var(--bg);
+}
+
+body::-webkit-scrollbar,
+.status-rail::-webkit-scrollbar,
+.home-main::-webkit-scrollbar,
+.messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track,
+.status-rail::-webkit-scrollbar-track,
+.home-main::-webkit-scrollbar-track,
+.messages::-webkit-scrollbar-track {
+  background: rgba(255, 253, 248, 0.55);
+}
+
+body::-webkit-scrollbar-thumb,
+.status-rail::-webkit-scrollbar-thumb,
+.home-main::-webkit-scrollbar-thumb,
+.messages::-webkit-scrollbar-thumb {
+  background: rgba(216, 116, 63, 0.32);
+  border-radius: 999px;
+}
+
+body::-webkit-scrollbar-thumb:hover,
+.status-rail::-webkit-scrollbar-thumb:hover,
+.home-main::-webkit-scrollbar-thumb:hover,
+.messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(216, 116, 63, 0.5);
 }
 
 button, input, select, textarea { font: inherit; }
@@ -632,17 +667,22 @@ input:focus, select:focus, textarea:focus {
 
 .home-header-actions {
   display: grid;
-  grid-template-columns: repeat(2, max-content);
+  grid-template-columns: repeat(3, minmax(92px, 1fr));
   gap: 6px;
   justify-content: end;
+  width: min(100%, 330px);
+}
+
+.home-header-actions button,
+.library-inline-button {
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 10px;
+  font-size: 12px;
+  text-align: center;
 }
 
 .library-inline-button {
-  grid-column: 2;
-  width: 100%;
-  min-height: 32px;
-  padding: 6px 10px;
-  font-size: 12px;
   color: var(--accent-dark);
   background: rgba(216, 116, 63, 0.11);
   border: 1px solid rgba(216, 116, 63, 0.22);
@@ -651,6 +691,10 @@ input:focus, select:focus, textarea:focus {
 .library-inline-button:disabled {
   cursor: wait;
   opacity: 0.72;
+}
+
+.mobile-setup-button {
+  display: none;
 }
 
 /* 自定义房间互动 */
@@ -931,6 +975,35 @@ input:focus, select:focus, textarea:focus {
   font-size: 12px;
 }
 
+/* ===== 电脑端外层滚动 ===== */
+@media (min-width: 1181px) {
+  .app-shell {
+    min-height: 100vh;
+    place-items: center;
+  }
+
+  .home-app {
+    height: calc(100vh - 56px);
+    min-height: 680px;
+    overflow: hidden;
+    align-items: stretch;
+  }
+
+  .status-rail,
+  .home-main {
+    overflow-y: auto;
+  }
+
+  .chat-panel {
+    min-height: 0;
+  }
+
+  .messages {
+    min-height: 0;
+    max-height: none;
+  }
+}
+
 /* ===== 响应式：平板 ===== */
 @media (max-width: 1180px) {
   .home-app {
@@ -1098,12 +1171,24 @@ input:focus, select:focus, textarea:focus {
   .interaction-list { gap: 6px; margin-top: 10px; }
   .interaction-list button { padding: 10px 12px; font-size: 13px; }
   .home-header-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: min(100%, 250px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
   }
   .home-header-actions button {
     min-width: 0;
     width: 100%;
+  }
+
+  .mobile-setup-button {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid rgba(216, 116, 63, 0.24);
+    border-radius: 12px;
+    color: var(--accent-dark);
+    background: rgba(255, 253, 248, 0.96);
+    font-weight: 800;
+    box-shadow: 0 8px 18px rgba(96, 58, 36, 0.06);
   }
 
   /* 碎碎念 */
@@ -1246,6 +1331,283 @@ input:focus, select:focus, textarea:focus {
 
   .composer { padding: 10px; gap: 6px; }
   .composer input { min-height: 40px; font-size: 14px; }
+}
+
+/* ===== 手机精修：分段阅读感 ===== */
+@media (max-width: 860px) {
+  body {
+    background:
+      linear-gradient(180deg, rgba(255, 253, 248, 0.88), rgba(246, 238, 227, 0.96)),
+      var(--bg);
+  }
+
+  .home-app {
+    background: #f8f1e9;
+  }
+
+  .status-rail {
+    padding: 16px 14px 18px;
+    gap: 12px;
+    background: #fffaf2;
+    border-bottom: 8px solid rgba(216, 116, 63, 0.08);
+  }
+
+  .portrait {
+    width: 58px;
+    height: 58px;
+    box-shadow: 0 8px 18px rgba(96, 58, 36, 0.1);
+    order: 1;
+  }
+
+  .status-block {
+    padding-top: 3px;
+    order: 2;
+  }
+
+  .status-block .eyebrow,
+  .home-header .eyebrow,
+  .room-copy .eyebrow,
+  .chat-sync-label {
+    font-weight: 800;
+    color: var(--accent-dark);
+  }
+
+  .status-block h2 {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .time-grid,
+  .home-header-actions {
+    gap: 8px;
+  }
+
+  .time-grid {
+    order: 3;
+  }
+
+  .status-rail .status-card {
+    order: 4;
+  }
+
+  .status-rail .ghost-button {
+    order: 5;
+  }
+
+  .time-grid div,
+  .status-rail .status-card,
+  .room-copy,
+  .camera-log,
+  .room-art {
+    border-radius: 14px;
+    border-color: rgba(216, 116, 63, 0.16);
+    background: rgba(255, 253, 248, 0.94);
+    box-shadow: 0 10px 24px rgba(96, 58, 36, 0.07);
+  }
+
+  .weather-top {
+    border: 1px solid rgba(216, 116, 63, 0.22) !important;
+    background: rgba(255, 253, 248, 0.96) !important;
+  }
+
+  .card-title,
+  .section-title,
+  .chat-header strong {
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  .card-title span:first-child,
+  .section-title > span:first-child {
+    font-size: 15px;
+  }
+
+  .jiang-status dt {
+    font-weight: 700;
+  }
+
+  .jiang-status dd,
+  .inner-thought,
+  #cameraFeed,
+  .camera-log ul {
+    font-size: 13px;
+    line-height: 1.68;
+  }
+
+  .home-main {
+    padding: 16px 14px 18px;
+    gap: 16px;
+    background: #f8f1e9;
+  }
+
+  .home-header {
+    padding: 2px 2px 14px;
+    border-bottom: 1px solid rgba(216, 116, 63, 0.14);
+  }
+
+  .home-header h1 {
+    font-size: 24px;
+    font-weight: 850;
+    line-height: 1.18;
+  }
+
+  .home-header-actions button {
+    min-height: 40px;
+    border-radius: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .mobile-setup-button {
+    min-height: 44px;
+    border-radius: 14px;
+    letter-spacing: 0;
+  }
+
+  .room-tabs {
+    padding: 0 0 12px;
+    border-bottom: 1px solid rgba(216, 116, 63, 0.12);
+  }
+
+  .room-tabs button {
+    min-height: 34px;
+    padding: 7px 12px;
+    font-weight: 700;
+    background: rgba(255, 253, 248, 0.88);
+  }
+
+  .room-stage {
+    gap: 12px;
+  }
+
+  .room-art {
+    overflow: hidden;
+  }
+
+  .room-copy {
+    padding: 14px;
+  }
+
+  .room-copy h2 {
+    font-size: 19px;
+    font-weight: 850;
+    line-height: 1.28;
+  }
+
+  .room-copy p {
+    font-size: 14px;
+    line-height: 1.72;
+  }
+
+  .interaction-list {
+    gap: 9px;
+  }
+
+  .interaction-list button,
+  .custom-interaction input,
+  .custom-interaction button {
+    min-height: 42px;
+    border-radius: 12px;
+  }
+
+  .section-block {
+    padding-top: 14px;
+    border-top: 8px solid rgba(216, 116, 63, 0.08);
+  }
+
+  .section-title {
+    padding: 0 2px 9px;
+  }
+
+  .section-title button,
+  .memory-range button,
+  .memory-range input {
+    min-height: 32px;
+    border-radius: 10px;
+  }
+
+  .camera-log {
+    padding: 12px 13px;
+    max-height: 280px;
+  }
+
+  .chat-panel {
+    margin-top: 6px;
+    min-height: 78vh;
+    background: #fffaf2;
+    border-top: 8px solid rgba(216, 116, 63, 0.08);
+  }
+
+  .chat-header {
+    min-height: 58px;
+    padding: 11px 12px;
+    background: rgba(255, 253, 248, 0.96);
+  }
+
+  .chat-header button,
+  .chat-header-actions button {
+    border-radius: 12px;
+  }
+
+  .floor-controls {
+    padding: 8px 10px;
+    background: rgba(255, 253, 248, 0.72);
+    border-bottom: 1px solid rgba(216, 116, 63, 0.1);
+  }
+
+  .messages {
+    padding: 14px 10px;
+    gap: 4px;
+    background: linear-gradient(180deg, #f8f1e9, #fffaf2);
+  }
+
+  .bubble {
+    padding: 9px 11px;
+    border-radius: 14px;
+    line-height: 1.55;
+    box-shadow: 0 6px 14px rgba(96, 58, 36, 0.06);
+  }
+
+  .message.me .bubble {
+    border-bottom-right-radius: 6px;
+  }
+
+  .message.oc .bubble {
+    border-bottom-left-radius: 6px;
+  }
+
+  .composer {
+    padding: 10px 12px;
+    background: rgba(255, 253, 248, 0.98);
+    border-top: 1px solid rgba(216, 116, 63, 0.13);
+  }
+
+  .composer input,
+  .composer > button,
+  #emojiButton {
+    border-radius: 999px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-header h1 {
+    font-size: 23px;
+  }
+
+  .home-header-actions {
+    gap: 6px;
+  }
+
+  .home-header-actions button {
+    padding-inline: 6px;
+    font-size: 12px;
+  }
+
+  .status-rail,
+  .home-main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }
 
 /* ===== 色色记事本弹窗（书本样式） ===== */
