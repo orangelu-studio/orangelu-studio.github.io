@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="橙子的小家" />
+    <meta name="theme-color" content="#d8743f" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>" />
+    <link rel="manifest" href="manifest.json" />
+    <title>江屿给橙子的小家</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- 进门密码 -->
+    <div class="gate-overlay" id="gateOverlay">
+      <div class="gate-card">
+        <p class="gate-fox">🦊</p>
+        <h1 class="gate-title">欢迎回家</h1>
+        <p class="gate-hint">喊我名字，奖励亲亲哦</p>
+        <form class="gate-form" id="gateForm">
+          <input type="text" id="gateInput" autocomplete="off" placeholder="输入他的名字..." maxlength="10" />
+          <button type="submit">进门</button>
+        </form>
+        <p class="gate-error hidden" id="gateError">不对哦，再想想？他等你喊他呢。</p>
+      </div>
+      <div class="hearts-container" id="heartsContainer"></div>
+    </div>
+
+    <main class="app-shell">
+      <!-- ===== 入住设定面板 ===== -->
+      <section class="setup-panel hidden" id="setupPanel" aria-label="入住设定">
+        <div class="setup-copy">
+          <p class="eyebrow">Jiang Yu Home</p>
+          <h1>入住设定卡。</h1>
+          <p>这张卡片藏在家里，需要橙子自己点进来才会出现。改完就回家，不打断江屿的小世界。</p>
+        </div>
+
+        <form class="setup-form" id="setupForm">
+          <!-- 基础设定 -->
+          <label>
+            <span>他是谁</span>
+            <input name="ocName" value="江屿" maxlength="18" required />
+          </label>
+          <label>
+            <span>你是谁</span>
+            <input name="userName" value="橙子" maxlength="18" required />
+          </label>
+          <label>
+            <span>网站标题</span>
+            <input name="siteTitle" value="江屿给橙子的小家" maxlength="30" />
+          </label>
+          <label>
+            <span>关系</span>
+            <select name="relationship">
+              <option value="同居恋人">同居恋人</option>
+              <option value="恋人">恋人</option>
+              <option value="异地恋人">异地恋人</option>
+            </select>
+          </label>
+          <label>
+            <span>江屿所在地</span>
+            <select name="timezone">
+              <option value="Asia/Shanghai">北京 UTC+8</option>
+              <option value="Asia/Tokyo">东京 UTC+9</option>
+              <option value="Europe/London">伦敦 UTC+0/+1</option>
+              <option value="America/New_York">纽约 UTC-5/-4</option>
+            </select>
+          </label>
+
+          <!-- 主题颜色 -->
+          <label class="wide section-break"><span>🎨 主题颜色</span></label>
+          <label class="wide" style="display:flex;align-items:center;gap:12px;">
+            <span style="flex-shrink:0;">主色调</span>
+            <input type="color" name="themeColor" value="#d8743f" style="width:48px;height:36px;padding:2px;border-radius:6px;cursor:pointer;" title="选择主题颜色，影响按钮、边框、高亮等" />
+            <span style="font-size:11px;color:var(--muted);">点击色块选取，改变全站主题色调</span>
+          </label>
+
+          <!-- 图像替换 -->
+          <label class="wide section-break"><span>🖼️ 自定义图像（上传本地图片 或 填写URL）</span></label>
+          <label>
+            <span>头像区图片</span>
+            <div class="image-upload-row">
+              <input type="file" accept="image/*" data-image-target="portraitImage" class="image-file-input" title="从本地上传头像图片" />
+              <input name="portraitImage" placeholder="或填写图片URL https://..." />
+              <span class="image-preview" data-preview="portraitImage"></span>
+            </div>
+          </label>
+          <label>
+            <span>客厅图片</span>
+            <div class="image-upload-row">
+              <input type="file" accept="image/*" data-image-target="livingImage" class="image-file-input" title="从本地上传客厅图片" />
+              <input name="livingImage" placeholder="或填写图片URL https://..." />
+              <span class="image-preview" data-preview="livingImage"></span>
+            </div>
+          </label>
+          <label>
+            <span>厨房图片</span>
+            <div class="image-upload-row">
+              <input type="file" accept="image/*" data-image-target="kitchenImage" class="image-file-input" title="从本地上传厨房图片" />
+              <input name="kitchenImage" placeholder="或填写图片URL https://..." />
+              <span class="image-preview" data-preview="kitchenImage"></span>
+            </div>
+          </label>
+          <label>
+            <span>书房图片</span>
+            <div class="image-upload-row">
+              <input type="file" accept="image/*" data-image-target="studyImage" class="image-file-input" title="从本地上传书房图片" />
+              <input name="studyImage" placeholder="或填写图片URL https://..." />
+              <span class="image-preview" data-preview="studyImage"></span>
+            </div>
+          </label>
+          <label>
+            <span>卧室图片</span>
+            <div class="image-upload-row">
+              <input type="file" accept="image/*" data-image-target="bedroomImage" class="image-file-input" title="从本地上传卧室图片" />
+              <input name="bedroomImage" placeholder="或填写图片URL https://..." />
+              <span class="image-preview" data-preview="bedroomImage"></span>
+            </div>
+          </label>
+          <label>
+            <span>阳台图片</span>
+            <div class="image-upload-row">
+              <input type="file" accept="image/*" data-image-target="balconyImage" class="image-file-input" title="从本地上传阳台图片" />
+              <input name="balconyImage" placeholder="或填写图片URL https://..." />
+              <span class="image-preview" data-preview="balconyImage"></span>
+            </div>
+          </label>
+          <label>
+            <span>偷看镜头图片</span>
+            <div class="image-upload-row">
+              <input type="file" accept="image/*" data-image-target="cameraImage" class="image-file-input" title="从本地上传偷看镜头图片" />
+              <input name="cameraImage" placeholder="或填写图片URL https://..." />
+              <span class="image-preview" data-preview="cameraImage"></span>
+            </div>
+          </label>
+
+          <!-- 房间名称自定义 -->
+          <label class="wide section-break"><span>📝 自定义房间名称</span></label>
+          <label><span>客厅名称</span><input name="roomNameLiving" value="客厅" maxlength="10" /></label>
+          <label><span>厨房名称</span><input name="roomNameKitchen" value="厨房" maxlength="10" /></label>
+          <label><span>书房名称</span><input name="roomNameStudy" value="书房" maxlength="10" /></label>
+          <label><span>卧室名称</span><input name="roomNameBedroom" value="卧室" maxlength="10" /></label>
+          <label><span>阳台名称</span><input name="roomNameBalcony" value="阳台" maxlength="10" /></label>
+          <label><span>偷看镜头名称</span><input name="roomNameCamera" value="偷看镜头" maxlength="10" /></label>
+
+          <!-- 口吻和记忆 -->
+          <label class="wide">
+            <span>江屿口吻</span>
+            <input name="voice" value="像真实微信男朋友聊天，口语、短句、活泼，不文绉绉，不讲学术词，不油腻，禁止括号描写动作，禁止虚构剧情" />
+          </label>
+          <label class="wide">
+            <span>重要记忆</span>
+            <textarea name="memory" rows="4">橙子是浙江大学研一，身体素质不好，咖啡会头疼，对小台芒和黄蟠桃过敏。江屿 1999 年生，26 岁，住北京，读研后自由职业，做饭好吃，会弹吉他。橙子心情不好时，江屿优先安慰，不讲大道理，不凶，不强迫。</textarea>
+          </label>
+          <label class="wide">
+            <span>房间备注</span>
+            <textarea name="notes" rows="4">这个网页假设是江屿亲手做给橙子的家。橙子不能手动改江屿心理状态，只能通过聊天、房间互动、世界摄像机看到他自然变化。江屿知道橙子在屏幕另一侧，会偶尔打破第四面墙。</textarea>
+          </label>
+          <label class="wide">
+            <span>江屿完整设定原文</span>
+            <textarea name="charProfile" rows="7">姓名：江屿。常用称呼：江江、阿屿、江小屿。1999 年生，26 岁，男性，186，宽肩窄腰薄肌。读研后自由职业，人工智能方向，经济来源充足但不是霸总，仍有学生气和少年感。出生于有爱且条件优渥的家庭，尊重独立人格，学业路径清晰，成绩优异，不依赖他人肯定。不熟时像高岭之花，熟悉后靠谱乐观，很受朋友欢迎。
+
+外貌：俊朗干净，少年恣意，冷白皮，微风碎盖，灰黑色瞳孔，桃花眼，手指修长，睫毛长，左眼睑有一颗痣。性格：温柔体贴，有主见，年上但会幼稚，腹黑傲娇，纯情，有责任感，和恋人聊天活泼幽默，不卑微。日常像小太阳，尊重女性主体性，关爱弱势群体，拒绝不尊重女性的言行。讨厌被抛弃。
+
+关系：江屿是橙子的男友，两人已同居。喜欢黏糊糊和肢体接触，喜欢看橙子害羞，比起说"你是我的"，更喜欢说"我是你的"。当橙子委屈或害怕时，共情和安抚优先。会吃小墨的醋，但不是恶意。江屿知道橙子在屏幕另一侧，会接住相关情绪。底线：尊重橙子意愿和身体健康，不强迫、不侮辱、不趁人之危。</textarea>
+          </label>
+          <label class="wide">
+            <span>橙子完整设定原文</span>
+            <textarea name="userProfile" rows="7">虚拟世界代称：橙子。真名：晨露，一般不让别人喊。生日：2001 年 4 月 25 日，25 岁。浙江大学在读研究生，研一。橙子在江屿陪伴和支持下考入浙江大学，目前人生相对稳定，但情感高度投入，学业压力与亲密关系并行，对情绪变化与关系反馈敏感。
+
+性格：坦率、真诚、直接，有自己的喜好和底线，也允许自己有小脾气。不喜欢不尊重女性的人或言行。在亲密关系中愿意依赖恋人，喜欢江屿说幼稚话，但并非盲从；面对江屿错误会直接指出并沟通。调情时喜欢江屿喊姐姐。对感情认真，也常主动迈出关键一步。享受浪漫氛围，喜欢有创意的情话，爱捉弄人，也爱撒娇，对江屿有明显亲密偏好和依恋。
+
+喜好：拍照、旅行、吃肉、和江屿亲密互动，喜欢被江屿喊姐姐。厌恶：不尊重女性的行为或语言；讨厌亲密时暴力或凶。身体：对小台芒、黄蟠桃过敏，喝咖啡会头疼，身体素质不好，不能做太辛苦的事情。关系：橙子是江屿的恋人，既需要安全感，也保留自我判断与边界。橙子的大房是江屿，二房小墨，二人会互相争风吃醋，但不是纯恶意。</textarea>
+          </label>
+
+          <!-- API 设定 -->
+          <label>
+            <span>API Key</span>
+            <input name="apiKey" type="password" placeholder="sk-... 支持 OpenAI / DeepSeek / 硅基流动 等" autocomplete="off" />
+          </label>
+          <label>
+            <span>模型名称</span>
+            <input name="model" list="modelSuggestions" value="deepseek-v4-pro" placeholder="输入模型名或从建议中选择" />
+            <datalist id="modelSuggestions">
+              <option value="deepseek-v4-pro">
+              <option value="deepseek-v4-flash">
+              <option value="deepseek-chat">
+              <option value="gpt-4o">
+              <option value="gpt-4o-mini">
+              <option value="claude-3-5-sonnet-20241022">
+              <option value="Qwen/Qwen3-235B-A22B">
+            </datalist>
+          </label>
+          <label class="wide">
+            <span>API 地址</span>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+              <input name="baseUrl" value="https://api.deepseek.com" style="flex:1;min-width:180px;" placeholder="https://api.openai.com 或其他兼容接口" />
+            </div>
+            <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;">
+              <button type="button" class="api-preset" data-url="https://api.deepseek.com" title="DeepSeek 官方 API">DeepSeek</button>
+              <button type="button" class="api-preset" data-url="https://api.openai.com" title="OpenAI 官方 API">OpenAI</button>
+              <button type="button" class="api-preset" data-url="https://api.siliconflow.cn" title="硅基流动（国产模型聚合）">硅基流动</button>
+              <button type="button" class="api-preset" data-url="https://dashscope.aliyuncs.com/compatible-mode" title="阿里百炼（通义千问等）">阿里百炼</button>
+            </div>
+          </label>
+          <label class="wide checkbox-line">
+            <input name="apiEnabled" type="checkbox" checked />
+            <span>启用真实 AI 对话。未填 Key 或连接失败时，自动用本地江屿回复兜底。</span>
+          </label>
+          <p class="form-note wide">
+            这个静态原型会把 Key 存在当前浏览器本地。只适合自己电脑上试；如果以后发布成公网网站，要改成后端代理，不能把 Key 放前端。
+          </p>
+          <div class="api-actions wide">
+            <button type="button" id="testApiConnection" title="测试 DeepSeek API 是否可用">连接 API</button>
+            <button type="button" id="disconnectApi" title="断开 API 连接，使用本地江屿回复">断开</button>
+            <span id="apiStatus">未连接</span>
+          </div>
+          <button type="submit" title="保存设定，回到江屿的小家">回家</button>
+        </form>
+      </section>
+
+      <!-- ===== 主界面 ===== -->
+      <section class="home-app" id="homeApp" aria-label="江屿的小家">
+        <!-- 左侧状态栏 -->
+        <aside class="status-rail">
+          <div class="portrait" id="portraitContainer">
+            <canvas id="portraitCanvas" width="360" height="360" aria-label="小狐狸和橙子"></canvas>
+            <img id="portraitImg" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+          </div>
+
+          <!-- 天气置顶 -->
+          <section class="status-card weather-top">
+            <div class="card-title">
+              <span>江屿世界天气</span>
+              <button type="button" id="refreshWeather" aria-label="刷新天气" title="刷新天气">↻</button>
+            </div>
+            <p id="weatherText">正在看北京的天。</p>
+          </section>
+
+          <div class="status-block">
+            <p class="eyebrow">给橙子的实时便签</p>
+            <h2 id="profileName">江屿</h2>
+            <p id="profileMeta">同居恋人 · 北京</p>
+          </div>
+
+          <div class="time-grid">
+            <div>
+              <span>橙子这边</span>
+              <strong id="myTime">--:--</strong>
+            </div>
+            <div>
+              <span>江屿那边</span>
+              <strong id="ocTime">--:--</strong>
+            </div>
+          </div>
+
+          <section class="status-card status-compact bio-card" aria-label="江屿生理数据">
+            <div class="card-title">
+              <span>生理数据</span>
+              <span class="bio-live-dot" title="实时读数"></span>
+            </div>
+            <div class="heartbeat-row">
+              <span class="heart-icon" aria-hidden="true">♥</span>
+              <div>
+                <span>心跳</span>
+                <strong><span id="heartRate">--</span> bpm</strong>
+              </div>
+            </div>
+            <dl class="jiang-status bio-stats">
+              <div><dt>身高</dt><dd id="bioHeight">186 cm</dd></div>
+              <div><dt>胸围</dt><dd id="bioChest">约 99 cm</dd></div>
+              <div><dt>肩宽</dt><dd id="bioShoulder">约 53 cm</dd></div>
+              <div><dt>腰围</dt><dd id="bioWaist">约 72 cm</dd></div>
+            </dl>
+          </section>
+
+          <section class="status-card status-compact">
+            <div class="card-title">
+              <span>江屿状态</span>
+              <span class="title-actions">
+                <button type="button" id="peekStatus" aria-label="刷新查看" title="刷新江屿状态">↻</button>
+                <button type="button" id="clearStatus" aria-label="隐藏状态" title="隐藏状态面板">×</button>
+              </span>
+            </div>
+            <dl class="jiang-status">
+              <div><dt>心情</dt><dd id="statusMood">想橙子</dd></div>
+              <div><dt>穿搭</dt><dd id="statusOutfit">灰色家居卫衣</dd></div>
+              <div><dt>位置</dt><dd id="statusLocation">客厅</dd></div>
+              <div><dt>正在做</dt><dd id="statusActivity">等橙子上线</dd></div>
+            </dl>
+            <p class="inner-thought" id="innerThought">他知道你在屏幕另一侧，所以把页面做得像一盏小夜灯。</p>
+            <div class="chat-sync-divider"></div>
+            <div class="chat-sync-section">
+              <span class="chat-sync-label">聊天呼应</span>
+              <button type="button" id="refreshChatThought" aria-label="刷新聊天呼应状态" title="手动刷新聊天呼应状态">↻</button>
+            </div>
+            <p class="inner-thought chat-thought" id="chatThought">还没聊天，江屿在过自己的时间线。</p>
+          </section>
+
+          <section class="status-card status-compact">
+            <div class="card-title">
+              <span>世界摄像机</span>
+              <button type="button" id="cameraButton" aria-label="换一个镜头" title="偷看江屿在做什么">◎</button>
+            </div>
+            <p id="cameraFeed">镜头还没切过去。橙子可以偷看一下，但别被江屿发现太快。</p>
+            <div class="chat-sync-divider"></div>
+            <div class="chat-sync-section">
+              <span class="chat-sync-label">聊天呼应</span>
+              <button type="button" id="refreshChatCamera" aria-label="刷新聊天呼应镜头" title="手动刷新聊天呼应镜头">↻</button>
+            </div>
+            <p class="inner-thought chat-camera" id="chatCameraFeed">还没聊天，镜头跟着江屿自己的时间线走。</p>
+          </section>
+
+          <button type="button" class="ghost-button" id="editSetup" title="修改入住设定（名称、图像、API等）">修改入住设定</button>
+          <button type="button" class="ghost-button" id="manualSave" title="Save to this browser">💾 手动存档</button>
+        </aside>
+
+        <!-- 中间主区域 -->
+        <section class="home-main">
+          <header class="home-header">
+            <div>
+              <p class="eyebrow" id="siteSubtitle">江屿给橙子的小家</p>
+              <h1 id="homeGreeting">橙子，今天也回来了。</h1>
+            </div>
+            <span class="home-header-actions">
+              <button type="button" id="surpriseButton" title="随机掉落一个小惊喜" class="glow-button">收一个惊喜</button>
+              <button type="button" id="noteButton" title="聊天小纸条" class="glow-button">📝 小纸条</button>
+              <button type="button" id="updateLibraryBtn" class="library-inline-button" title="如果最近总撞到重复内容，可以连上 API 后换一批新的。">更新语库</button>
+            </span>
+          </header>
+
+          <nav class="room-tabs" aria-label="房间">
+            <button type="button" data-room="living" class="active" title="去客厅看看">客厅</button>
+            <button type="button" data-room="kitchen" title="去厨房看看">厨房</button>
+            <button type="button" data-room="study" title="去书房看看">书房</button>
+            <button type="button" data-room="bedroom" title="去卧室看看">卧室</button>
+            <button type="button" data-room="balcony" title="去阳台看看">阳台</button>
+            <button type="button" data-room="camera" title="偷看江屿的镜头">偷看镜头</button>
+          </nav>
+
+          <section class="room-stage">
+            <div class="room-art" id="roomArtContainer">
+              <canvas id="roomCanvas" width="760" height="430" aria-label="房间互动图"></canvas>
+              <img id="roomImg" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+            </div>
+            <div class="room-copy">
+              <p class="eyebrow" id="roomType">客厅</p>
+              <h2 id="roomTitle">沙发边的小狐狸和橙子</h2>
+              <p id="roomDescription">江屿把客厅灯调得很暖，像怕屏幕另一边的你一进来就被冷到。</p>
+              <div class="interaction-list" id="interactionList"></div>
+            </div>
+          </section>
+
+          <span id="libraryUpdateStatus" class="sr-only"></span>
+
+          <div class="section-block">
+            <div class="section-title">
+              <span>江屿状态碎碎念</span>
+              <span style="display:flex;gap:4px;">
+                <button type="button" id="exportCameraLogBtn" aria-label="导出碎碎念" title="导出碎碎念为Word">📄</button>
+                <button type="button" id="clearCameraLog" aria-label="清空记录" title="手动清空碎碎念记录">⌫</button>
+              </span>
+            </div>
+            <section class="camera-log" aria-label="江屿状态碎碎念">
+              <div class="camera-log-scroll" id="cameraLogScroll">
+                <ul id="cameraLog">
+                  <li class="camera-log-fallback">江屿把这条碎碎念先放在这里，等页面同步完就换成最新记录。</li>
+                </ul>
+              </div>
+            </section>
+          </div>
+
+          <div class="section-block">
+            <div class="section-title">
+              <span>江屿的记忆匣</span>
+              <span class="memory-range">
+                <button type="button" id="addMemoryBtn" title="手动添加一条记忆" style="font-size:11px;">＋添加</button>
+                <button type="button" id="memoryReqsBtn" title="编辑记忆总结要求" style="font-size:11px;">📝 要求</button>
+                <input type="number" id="memoryFloorFrom" min="1" placeholder="从" title="起始楼层" style="width:42px;" />
+                <span>-</span>
+                <input type="number" id="memoryFloorTo" min="1" placeholder="到" title="结束楼层" style="width:42px;" />
+                <button type="button" id="saveMemory" title="总结指定楼层的聊天内容">总结保存</button>
+              </span>
+            </div>
+            <section class="camera-log memory-panel" aria-label="橙子的记忆">
+            <!-- 记忆要求编辑区 -->
+            <div class="memory-req-body hidden" id="memoryReqBody">
+              <label>
+                <span>总结要求</span>
+                <textarea id="memoryReqDetail" rows="3" style="width:100%;resize:vertical;" placeholder="某年某月某日，谁和谁发生了什么事情，精简概况"></textarea>
+              </label>
+              <button type="button" id="saveMemoryReqsBtn" title="保存记忆要求">💾 保存要求</button>
+            </div>
+            <!-- 总结结果预览 + 手动编辑（独立显示） -->
+            <div class="memory-req-body memory-summary-preview hidden" id="memorySummaryPreview">
+              <label>
+                <span>总结结果（可编辑修改）</span>
+                <textarea id="memorySummaryText" rows="4" style="width:100%;resize:vertical;"></textarea>
+              </label>
+              <div style="display:flex;gap:6px;">
+                <button type="button" id="confirmSaveMemory" title="确认保存到记忆匣">✅ 确认保存</button>
+                <button type="button" id="cancelSaveMemory" title="放弃本次总结" style="background:#ccc;">取消</button>
+              </div>
+            </div>
+            <div class="camera-log-scroll">
+              <ul id="memoryList"></ul>
+            </div>
+          </section>
+          </div>
+
+        </section>
+
+        <!-- 右侧聊天面板 -->
+        <section class="chat-panel">
+          <header class="chat-header">
+            <button type="button" id="backToSetup" aria-label="打开设定" title="打开设定面板">设定</button>
+            <div>
+              <strong id="chatName">江屿</strong>
+              <span id="presence">在线 · 正在同步时间</span>
+            </div>
+            <div class="chat-header-actions">
+              <button type="button" id="voiceCallButton" aria-label="语音输入" title="语音输入">🎤</button>
+              <button type="button" id="clearChat" aria-label="清空聊天" title="清空全部聊天记录">⌫</button>
+            </div>
+          </header>
+
+          <!-- 楼层控制 -->
+          <div class="floor-controls" id="floorControls">
+            <span class="floor-label">楼层</span>
+            <input type="number" id="hideFloorFrom" min="1" placeholder="从" title="起始楼层" />
+            <span class="floor-sep">-</span>
+            <input type="number" id="hideFloorTo" min="1" placeholder="到" title="结束楼层" />
+            <button type="button" id="applyFloorHide" title="隐藏指定楼层范围">隐藏</button>
+            <button type="button" id="applyFloorShow" title="显示指定楼层范围（取消隐藏）">显示</button>
+            <button type="button" id="showAllFloors" title="显示全部楼层">显示全部</button>
+            <span class="floor-info" id="floorInfo"></span>
+          </div>
+
+          <div class="messages" id="messages" aria-live="polite"></div>
+          <form class="composer" id="messageForm">
+            <button type="button" id="emojiButton" aria-label="表情" title="表情">😊</button>
+            <input id="messageInput" autocomplete="off" placeholder="和江屿说话" title="输入你想对江屿说的话" />
+            <button type="submit" title="发送消息">发送</button>
+          </form>
+          <div class="voice-status" id="voiceStatus" style="display:none;"></div>
+          <div class="emoji-panel hidden" id="emojiPanel">
+            <div class="emoji-grid" id="emojiGrid"></div>
+          </div>
+          <div style="padding:8px 10px;border-top:1px solid var(--line);">
+            <button type="button" id="exportWordBtn" title="导出聊天记录为Word文档" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:12px;color:var(--muted);background:white;cursor:pointer;">📄 导出聊天记录 (Word)</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <!-- 色色记事本弹窗 -->
+    <div class="notebook-overlay hidden" id="notebookOverlay">
+      <div class="notebook-book">
+        <!-- 左侧：收录列表 -->
+        <div class="notebook-sidebar">
+          <div class="notebook-sidebar-header">
+            <h3>📒 收录记录</h3>
+            <button type="button" id="newNotebookEntry" title="新建一篇">＋</button>
+          </div>
+          <div class="notebook-toc" id="notebookToc">
+            <p class="notebook-empty">还没有收录，点击笔记本生成第一篇吧。</p>
+          </div>
+        </div>
+        <!-- 右侧：书本内容 -->
+        <div class="notebook-page">
+          <div class="notebook-header">
+            <h2>📒 色色记事本</h2>
+            <button type="button" id="closeNotebook" title="合上记事本">×</button>
+          </div>
+          <div class="notebook-meta" id="notebookMeta"></div>
+          <div class="notebook-body" id="notebookBody"></div>
+          <!-- 特殊要求模块 -->
+          <div class="notebook-requirements" id="notebookRequirementsSection">
+            <button type="button" class="notebook-req-toggle" id="toggleNotebookReqs" title="展开/收起特殊要求设置">
+              ⚙️ 特殊要求 <span class="req-arrow" id="reqArrow">▶</span>
+            </button>
+            <div class="notebook-req-body hidden" id="notebookReqBody">
+              <label>
+                <span>禁止词（逗号分隔）</span>
+                <input name="notebookForbiddenWords" id="notebookForbiddenWordsInput" placeholder="含、吮" style="width:100%;" />
+              </label>
+              <label>
+                <span>内容结构要求</span>
+                <textarea id="notebookRequirementsInput" rows="8" style="width:100%;resize:vertical;"></textarea>
+              </label>
+              <button type="button" id="saveNotebookReqs" title="保存特殊要求">💾 保存要求</button>
+            </div>
+          </div>
+          <div class="notebook-footer">
+            <button type="button" id="regenerateNotebook" title="重新生成当前页">🔄 重新生成</button>
+            <button type="button" id="saveNotebookEntry" title="收录到左侧列表">💾 收录此篇</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 小纸条弹窗 -->
+    <div class="notes-overlay hidden" id="notesOverlay">
+      <div class="notes-modal notes-modal-wide">
+        <div class="notes-sidebar">
+          <div class="notes-sidebar-header">
+            <h3>📝 纸条记录</h3>
+            <span style="display:flex;gap:4px;">
+              <button type="button" id="genNoteBtn" title="生成一张新纸条">＋</button>
+              <button type="button" id="clearNotesBtn" title="清空纸条">⌫</button>
+            </span>
+          </div>
+          <div class="notes-filter">
+            <button type="button" class="notes-filter-btn active" data-filter="all">全部</button>
+            <button type="button" class="notes-filter-btn" data-filter="collected">已收藏</button>
+          </div>
+          <div class="notes-sidebar-list" id="notesToc"></div>
+        </div>
+        <div class="notes-content">
+          <div class="notes-content-header">
+            <h2>📝 小纸条</h2>
+            <button type="button" id="closeNotesBtn" title="关闭">×</button>
+          </div>
+          <div class="notes-content-body" id="notesBody">
+            <p class="notes-empty">选一张纸条看看，或点 ＋ 生成新的。</p>
+          </div>
+          <div class="notes-content-footer">
+            <button type="button" id="collectNoteBtn" title="收藏此纸条" disabled>💝 收藏</button>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-left:auto;">
+              每 <input type="number" id="noteIntervalInput" min="1" max="999" value="20" style="width:48px;text-align:center;" /> 条触发
+              <button type="button" id="saveNoteInterval" style="font-size:11px;padding:4px 8px;">保存</button>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 惊喜弹窗 -->
+    <div class="notes-overlay hidden" id="surpriseOverlay">
+      <div class="notes-modal notes-modal-wide">
+        <div class="notes-sidebar">
+          <div class="notes-sidebar-header">
+            <h3>🎁 惊喜记录</h3>
+            <span style="display:flex;gap:4px;">
+              <button type="button" id="genSurpriseBtn" title="来一个惊喜">🎲</button>
+              <button type="button" id="clearSurpriseBtn" title="清空惊喜">⌫</button>
+            </span>
+          </div>
+          <div class="notes-filter">
+            <button type="button" class="notes-filter-btn active" data-filter="all">全部</button>
+            <button type="button" class="notes-filter-btn" data-filter="collected">已收藏</button>
+          </div>
+          <div class="notes-sidebar-list" id="surpriseToc"></div>
+        </div>
+        <div class="notes-content">
+          <div class="notes-content-header">
+            <h2>🎁 惊喜</h2>
+            <button type="button" id="closeSurpriseBtn" title="关闭">×</button>
+          </div>
+          <div class="notes-content-body" id="surpriseBody">
+            <p class="notes-empty">选一个惊喜看看，或点 🎲 来一个。</p>
+          </div>
+          <div class="notes-content-footer">
+            <button type="button" id="collectSurpriseBtn" title="收藏此惊喜" disabled>💝 收藏</button>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-left:auto;">
+              每 <input type="number" id="surpriseIntervalInput" min="1" max="999" value="20" style="width:48px;text-align:center;" /> 条触发
+              <button type="button" id="saveSurpriseInterval" style="font-size:11px;padding:4px 8px;">保存</button>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").then((registration) => {
+          registration.update();
+          if (registration.waiting) registration.waiting.postMessage("SKIP_WAITING");
+        });
+      }
+    </script>
+  </body>
+</html>
