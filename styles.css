@@ -74,9 +74,14 @@ button { cursor: pointer; }
   position: fixed; inset: 0; z-index: 9999;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  background:
+  /* 实色底兜底 + 渐变 + 背景图，手机端背景图加载失败也不白屏 */
+  background-color: #1a3550;
+  background-image:
     linear-gradient(115deg, rgba(21, 49, 76, 0.42), rgba(39, 84, 121, 0.12) 48%, rgba(216, 104, 51, 0.24)),
-    url("assets/images/gate-sea.webp") center center / cover no-repeat;
+    url("assets/images/gate-sea.webp");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
   animation: gateSeaMove 12s ease-in-out infinite alternate;
   transition: opacity 0.8s, visibility 0.8s;
 }
