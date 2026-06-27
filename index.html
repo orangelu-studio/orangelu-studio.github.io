@@ -10,7 +10,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>" />
     <link rel="manifest" href="manifest.json" />
     <title>江屿给橙子的小家</title>
-    <link rel="stylesheet" href="styles.css?v=20260621-restored" />
+    <link rel="stylesheet" href="styles.css?v=20260627-v17" />
   </head>
   <body>
     <!-- 进门密码 -->
@@ -739,13 +739,14 @@
       </div>
     </div>
 
-    <script src="app.js?v=20260627-relationship-modules"></script>
+    <script src="app.js?v=20260627-v17"></script>
     <script>
+      // 强制注销所有旧 SW，再注册最新版
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js?v=20260525-cache-refresh").then((registration) => {
-          registration.update();
-          if (registration.active) registration.active.postMessage("CLEAR_OLD_CACHES");
-          if (registration.waiting) registration.waiting.postMessage("SKIP_WAITING");
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(r) { r.unregister(); });
+        }).then(function() {
+          navigator.serviceWorker.register("sw.js?v=20260627-v17");
         });
       }
     </script>
