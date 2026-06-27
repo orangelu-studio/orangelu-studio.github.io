@@ -10,13 +10,23 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>" />
     <link rel="manifest" href="manifest.json" />
     <title>江屿给橙子的小家</title>
-    <link rel="stylesheet" href="style.css?v=20260525-interaction-scroll" />
+    <link rel="stylesheet" href="styles.css?v=20260621-restored" />
   </head>
   <body>
     <!-- 进门密码 -->
     <div class="gate-overlay" id="gateOverlay">
       <div class="gate-card">
-        <p class="gate-fox">🦊</p>
+        <button class="gate-fox-art" id="gateFoxArt" type="button" aria-label="摸摸门口的大狐狸" title="摸摸它">
+          <span class="fox-tail"></span>
+          <span class="fox-body"></span>
+          <span class="fox-head">
+            <i class="fox-ear fox-ear-left"></i><i class="fox-ear fox-ear-right"></i>
+            <i class="fox-eye fox-eye-left"></i><i class="fox-eye fox-eye-right"></i>
+            <i class="fox-cheek fox-cheek-left"></i><i class="fox-cheek fox-cheek-right"></i>
+            <i class="fox-muzzle"></i><i class="fox-nose"></i>
+          </span>
+          <span class="fox-paw fox-paw-left"></span><span class="fox-paw fox-paw-right"></span>
+        </button>
         <h1 class="gate-title">欢迎回家</h1>
         <p class="gate-hint">喊我名字，奖励亲亲哦</p>
         <form class="gate-form" id="gateForm">
@@ -159,6 +169,18 @@
             <textarea name="notes" rows="4">这个网页假设是江屿亲手做给橙子的家。橙子不能手动改江屿心理状态，只能通过聊天、房间互动、世界摄像机看到他自然变化。江屿知道橙子在屏幕另一侧，会偶尔打破第四面墙。</textarea>
           </label>
           <label class="wide">
+            <span>破壁对白要求</span>
+            <textarea name="wallbreakRequirements" rows="4">江屿知道橙子正在屏幕另一侧看这个网页。用第一人称直接对橙子说话，口语、自然、亲密，可以提到页面、光标、刷新和隔着屏幕，但不卖惨，不说教，不文绉绉。江屿有自己的生活，也会主动分享。</textarea>
+          </label>
+          <label class="wide">
+            <span>衣柜与穿搭要求</span>
+            <textarea name="wardrobeRequirements" rows="4">符合江屿俊朗干净、少年恣意、有学生气又会照顾自己的气质。日常、居家、出门、弹吉他和运动穿搭都可以。保留灰黑、白、薄荷绿、海洋蓝等配色，可以有一两件只在家穿、稍微性感但不露骨的成年男性衣物。江屿听橙子的推荐，也保留自己的审美。</textarea>
+          </label>
+          <label class="wide">
+            <span>贴贴捏捏要求</span>
+            <textarea name="touchRequirements" rows="4">江屿肌肤饥渴，喜欢和橙子黏糊糊地接触，高攻低防，容易被“江江”“宝宝”和“姐姐”触发保护欲与害羞。回应口语、活泼、温柔、有边界，不强迫、不凶，不使用括号动作描写。</textarea>
+          </label>
+          <label class="wide">
             <span>江屿完整设定原文</span>
             <textarea name="charProfile" rows="7">姓名：江屿。常用称呼：江江、阿屿、江小屿。1999 年生，26 岁，男性，186，宽肩窄腰薄肌。读研后自由职业，人工智能方向，经济来源充足但不是霸总，仍有学生气和少年感。出生于有爱且条件优渥的家庭，尊重独立人格，学业路径清晰，成绩优异，不依赖他人肯定。不熟时像高岭之花，熟悉后靠谱乐观，很受朋友欢迎。
 
@@ -231,7 +253,7 @@
           </div>
 
           <!-- 天气置顶 -->
-          <section class="status-card weather-top">
+          <section class="status-card weather-top icon-card icon-weather">
             <div class="card-title">
               <span>江屿世界天气</span>
               <button type="button" id="refreshWeather" aria-label="刷新天气" title="刷新天气">↻</button>
@@ -256,7 +278,7 @@
             </div>
           </div>
 
-          <section class="status-card status-compact bio-card" aria-label="江屿生理数据">
+          <section class="status-card status-compact bio-card icon-card icon-heart" aria-label="江屿生理数据">
             <div class="card-title">
               <span>生理数据</span>
               <span class="bio-live-dot" title="实时读数"></span>
@@ -276,7 +298,7 @@
             </dl>
           </section>
 
-          <section class="status-card status-compact">
+          <section class="status-card status-compact icon-card icon-status">
             <div class="card-title">
               <span>江屿状态</span>
               <span class="title-actions">
@@ -299,7 +321,120 @@
             <p class="inner-thought chat-thought" id="chatThought">还没聊天，江屿在过自己的时间线。</p>
           </section>
 
-          <section class="status-card status-compact">
+          <section class="status-card status-compact wallbreak-card icon-card icon-screen">
+            <div class="card-title">
+              <span>隔着屏幕说给橙子</span>
+              <span class="title-actions">
+                <button type="button" class="module-setup-link" data-requirement-field="wallbreakRequirements" aria-label="修改破壁要求" title="修改破壁要求">要求</button>
+                <button type="button" id="refreshWallbreak" aria-label="刷新破壁对白" title="让江屿重新说一段">↻</button>
+              </span>
+            </div>
+            <div class="screen-bridge" aria-hidden="true">
+              <span class="bridge-person bridge-orange">橙</span>
+              <span class="bridge-signal"><i></i><i></i><i></i></span>
+              <span class="bridge-person bridge-jiang">屿</span>
+            </div>
+            <div class="wallbreak-copy" id="wallbreakText" aria-live="polite"></div>
+            <div class="wallbreak-actions">
+              <button type="button" id="tapScreen">敲敲屏幕</button>
+              <button type="button" id="moveScreenCloser">贴近一点</button>
+            </div>
+            <div class="wallbreak-letter-head">
+              <span>江屿写给橙子</span>
+              <button type="button" id="refreshWallbreakLetter" aria-label="刷新江屿写给橙子的长信" title="重新写一封">↻</button>
+            </div>
+            <article class="wallbreak-letter" id="wallbreakLetter"></article>
+          </section>
+
+          <section class="status-card status-compact wardrobe-card icon-card icon-wardrobe">
+            <div class="card-title">
+              <span>江屿的衣柜</span>
+              <span class="title-actions">
+                <button type="button" class="module-setup-link" data-requirement-field="wardrobeRequirements" aria-label="修改衣柜要求" title="修改衣柜要求">要求</button>
+                <button type="button" id="refreshWardrobe" aria-label="换一批衣物" title="重新打开一层衣柜">↻</button>
+              </span>
+            </div>
+            <div class="wardrobe-items" id="wardrobeItems" aria-live="polite"></div>
+            <button type="button" class="wardrobe-primary" id="viewTodayOutfit">查看今日穿搭</button>
+            <div class="wardrobe-today hidden" id="wardrobeToday">
+              <span>今天穿了什么</span>
+              <strong id="wardrobeTodayTitle"></strong>
+              <small id="wardrobeTodayDetail"></small>
+            </div>
+            <div class="wardrobe-field hidden" id="wardrobeReviewField">
+              <label for="wardrobeReview">评价他的穿搭</label>
+              <div class="wardrobe-action-row">
+                <select id="wardrobeReview">
+                  <option value="今天很帅">今天很帅</option>
+                  <option value="很适合你">很适合你</option>
+                  <option value="有少年感，我喜欢">少年感很好</option>
+                  <option value="太规矩了，松一点">太规矩了</option>
+                  <option value="领口再松一点">领口松一点</option>
+                  <option value="这套只许在家穿">只许在家穿</option>
+                </select>
+                <button type="button" id="submitWardrobeReview">告诉他</button>
+              </div>
+            </div>
+            <div class="wardrobe-field">
+              <label for="wardrobeRecommend">给江屿推荐一套</label>
+              <div class="wardrobe-action-row">
+                <select id="wardrobeRecommend">
+                  <option value="白衬衫配黑色长裤">白衬衫 + 黑色长裤</option>
+                  <option value="灰色连帽卫衣配运动裤">灰卫衣 + 运动裤</option>
+                  <option value="海洋蓝衬衫配白色内搭">海洋蓝衬衫</option>
+                  <option value="黑色高领配长风衣">黑色高领 + 长风衣</option>
+                  <option value="乐队演出时的黑衬衫和银色配饰">乐队黑衬衫</option>
+                  <option value="薄荷绿针织衫配浅灰长裤">薄荷绿针织衫</option>
+                  <option value="合身运动短袖配深色长裤">运动短袖</option>
+                  <option value="白T外面系一条深色围裙">白T + 深色围裙</option>
+                  <option value="黑色真丝睡袍，腰带松系">黑色真丝睡袍</option>
+                  <option value="宽松白衬衫，领口解开两颗">宽松白衬衫</option>
+                  <option value="微透黑色衬衫配银色项链">微透黑衬衫</option>
+                  <option value="低领灰色背心配松垮家居裤">低领背心 + 家居裤</option>
+                  <option value="贴身黑色训练上衣配运动长裤">贴身训练上衣</option>
+                  <option value="洗完澡只披一件深蓝薄衬衫">深蓝薄衬衫</option>
+                  <option value="海洋纹短袖配浅色牛仔裤">海洋纹短袖</option>
+                  <option value="浅灰休闲西装配黑色内搭">浅灰西装</option>
+                  <option value="墨绿防风外套配黑色工装裤">墨绿防风外套</option>
+                  <option value="奶白家居针织衫配赤脚居家造型">奶白家居针织衫</option>
+                  <option value="让江屿按自己的审美挑一套">让江屿自己挑</option>
+                </select>
+                <button type="button" id="submitWardrobeRecommend">推荐</button>
+              </div>
+            </div>
+            <p class="wardrobe-response" id="wardrobeResponse">衣柜给姐姐看，但不许把衣架弄乱。</p>
+          </section>
+
+          <section class="status-card status-compact touch-card icon-card icon-touch">
+            <div class="card-title">
+              <span>贴贴捏捏江屿</span>
+              <button type="button" class="module-setup-link" data-requirement-field="touchRequirements" aria-label="修改贴贴要求" title="修改贴贴要求">要求</button>
+            </div>
+            <div class="touch-readings">
+              <span>贴贴 <b id="touchCloseness">24</b><i><em id="touchClosenessBar"></em></i></span>
+              <span>害羞 <b id="touchShy">8</b><i><em id="touchShyBar"></em></i></span>
+              <span>心跳 <b id="touchHeartRate">72</b><i><em id="touchHeartBar"></em></i></span>
+            </div>
+            <div class="touch-map" id="touchPoints" aria-label="江屿贴贴互动图">
+              <div class="touch-silhouette" aria-hidden="true"><span></span><i></i><b></b></div>
+              <button type="button" data-touch-zone="hair" aria-label="摸江屿头发"><i>💇</i><span>头发</span></button>
+              <button type="button" data-touch-zone="eyeMole" aria-label="亲江屿左眼睑的痣"><i>👁</i><span>眼睑痣</span></button>
+              <button type="button" data-touch-zone="cheek" aria-label="捏江屿脸颊"><i>🤏</i><span>脸颊</span></button>
+              <button type="button" data-touch-zone="hand" aria-label="牵江屿的手"><i>🤝</i><span>手指</span></button>
+              <button type="button" data-touch-zone="shoulder" aria-label="靠江屿肩膀"><i>💪</i><span>肩膀</span></button>
+              <button type="button" data-touch-zone="chest" aria-label="贴江屿胸口"><i>💗</i><span>胸口</span></button>
+              <button type="button" data-touch-zone="waist" aria-label="捏江屿的腰"><i>〰</i><span>腰</span></button>
+              <button type="button" data-touch-zone="abs" aria-label="摸江屿腹肌"><i>🔥</i><span>腹肌</span></button>
+              <button type="button" data-touch-zone="thigh" aria-label="碰江屿大腿"><i>🦵</i><span>大腿</span></button>
+              <button type="button" data-touch-zone="leftNip" aria-label="碰江屿左咪咪"><i>🩷</i><span>左咪咪</span></button>
+              <button type="button" data-touch-zone="collarbone" aria-label="亲江屿锁骨"><i>🦴</i><span>锁骨</span></button>
+              <button type="button" data-touch-zone="rightNip" aria-label="碰江屿右咪咪"><i>🩷</i><span>右咪咪</span></button>
+            </div>
+            <button type="button" class="hug-jiang" data-touch-zone="hug">抱住江屿</button>
+            <p class="touch-response" id="touchResponse">姐姐，想贴哪里就点一下。江江看得见。</p>
+          </section>
+
+          <section class="status-card status-compact icon-card icon-camera">
             <div class="card-title">
               <span>世界摄像机</span>
               <button type="button" id="cameraButton" aria-label="换一个镜头" title="偷看江屿在做什么">◎</button>
@@ -344,7 +479,8 @@
           <section class="room-stage">
             <div class="room-art" id="roomArtContainer">
               <canvas id="roomCanvas" width="760" height="430" aria-label="房间互动图"></canvas>
-              <img id="roomImg" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px;" />
+              <img id="roomImg" alt="" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:8px;" />
+              <span class="room-light-badge" id="roomLightBadge">日间光</span>
             </div>
             <div class="room-copy">
               <p class="eyebrow" id="roomType">客厅</p>
@@ -463,7 +599,10 @@
         <div class="notebook-sidebar">
           <div class="notebook-sidebar-header">
             <h3>📒 收录记录</h3>
-            <button type="button" id="newNotebookEntry" title="新建一篇">＋</button>
+            <span class="notebook-sidebar-actions">
+              <button type="button" id="exportNotebookWord" title="导出全部收录为 Word">⇩</button>
+              <button type="button" id="newNotebookEntry" title="新建一篇">＋</button>
+            </span>
           </div>
           <div class="notebook-toc" id="notebookToc">
             <p class="notebook-empty">还没有收录，点击笔记本生成第一篇吧。</p>
@@ -476,6 +615,31 @@
             <button type="button" id="closeNotebook" title="合上记事本">×</button>
           </div>
           <div class="notebook-meta" id="notebookMeta"></div>
+          <div class="notebook-modes" aria-label="色色记事本模式">
+            <button type="button" class="active" id="notebookModeRandom">✦ 江屿来写</button>
+            <button type="button" id="notebookModePick">♡ 橙子来选</button>
+            <button type="button" id="notebookModeChat">⌁ 私密聊天</button>
+          </div>
+          <div class="notebook-mode-panel hidden" id="notebookPickPanel">
+            <label for="notebookThemeSelect">这次想看</label>
+            <select id="notebookThemeSelect">
+              <option value="温柔面对面，江屿全程照顾橙子的感受">温柔面对面</option>
+              <option value="橙子主动，江屿高攻低防地配合姐姐">姐姐来主导</option>
+              <option value="江屿温柔引导，先哄好橙子再慢慢推进">江屿来引导</option>
+              <option value="侧躺贴近，节奏轻松，避免橙子太累">侧躺贴近</option>
+              <option value="坐姿拥抱，重视接吻和大面积肢体接触">坐着抱紧</option>
+              <option value="四爱，由橙子主导，江屿自愿并明确表达感受">四爱</option>
+              <option value="浴室之后，头发还湿，先照顾身体再亲密">浴室之后</option>
+              <option value="书房里的暧昧拉扯，从聊天自然升级">书房暧昧</option>
+            </select>
+            <textarea id="notebookPickExtra" rows="2" placeholder="还想补充什么，比如称呼、氛围、节奏……"></textarea>
+            <button type="button" id="generateNotebookPick">生成这一篇</button>
+          </div>
+          <div class="notebook-mode-panel hidden" id="notebookChatPanel">
+            <label for="notebookChatInput">把想法告诉江屿</label>
+            <textarea id="notebookChatInput" rows="3" placeholder="写下场景、想法或想让江屿回应的话……"></textarea>
+            <button type="button" id="generateNotebookChat">让江屿接着写</button>
+          </div>
           <div class="notebook-body" id="notebookBody"></div>
           <!-- 特殊要求模块 -->
           <div class="notebook-requirements" id="notebookRequirementsSection">
@@ -497,6 +661,7 @@
           <div class="notebook-footer">
             <button type="button" id="regenerateNotebook" title="重新生成当前页">🔄 重新生成</button>
             <button type="button" id="saveNotebookEntry" title="收录到左侧列表">💾 收录此篇</button>
+            <button type="button" id="exportNotebookWord" title="导出为Word">📄 导出</button>
           </div>
         </div>
       </div>
@@ -574,11 +739,12 @@
       </div>
     </div>
 
-    <script src="script.js?v=20260525-interaction-scroll"></script>
+    <script src="app.js?v=20260627-relationship-modules"></script>
     <script>
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js?v=20260525-interaction-scroll").then((registration) => {
+        navigator.serviceWorker.register("sw.js?v=20260525-cache-refresh").then((registration) => {
           registration.update();
+          if (registration.active) registration.active.postMessage("CLEAR_OLD_CACHES");
           if (registration.waiting) registration.waiting.postMessage("SKIP_WAITING");
         });
       }
