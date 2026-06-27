@@ -3757,7 +3757,19 @@ document.querySelector("#closeNotebook").addEventListener("click", closeNotebook
 document.querySelector("#saveNotebookEntry").addEventListener("click", saveNotebookEntry);
 document.querySelector("#regenerateNotebook").addEventListener("click", regenerateNotebook);
 document.querySelector("#newNotebookEntry").addEventListener("click", () => openIntimateNotebook());
-document.querySelector("#exportNotebookWord").addEventListener("click", exportNotebookToWord);
+document.querySelector("#exportNotebookAllWord")?.addEventListener("click", exportNotebookToWord);
+document.querySelector("#exportNotebookWord")?.addEventListener("click", function() {
+  var body = document.querySelector("#notebookBody");
+  var content = body?.dataset.currentEntry || body?.textContent || "";
+  if (!content || content.length < 10) { addCameraLog("还没有可导出的内容。"); return; }
+  var date = document.querySelector("#notebookMeta")?.textContent?.trim() || new Date().toISOString().slice(0,10);
+  var html = '<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><title>色色记事本 - 单篇</title></head><body style="font-family:\'Microsoft YaHei\',sans-serif;max-width:780px;margin:0 auto;padding:24px;color:#26384a;"><h1 style="color:#315777;border-bottom:3px solid #e8793e;padding-bottom:10px;">江屿和橙子的色色记事本</h1><p style="color:#6c7b89;">'+date+'</p><p style="line-height:1.85;white-space:pre-wrap;">'+content.replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</p></body></html>';
+  var blob = new Blob([html], { type: "application/msword;charset=utf-8" });
+  var link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+  link.download = '记事本_'+new Date().toISOString().slice(0,10)+'.doc';
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  addCameraLog("📄 当前篇已导出。");
+});
 document.querySelector("#notebookModeRandom").addEventListener("click", () => openIntimateNotebook("random", ""));
 document.querySelector("#notebookModePick").addEventListener("click", () => selectNotebookMode("pick"));
 document.querySelector("#notebookModeChat").addEventListener("click", () => selectNotebookMode("chat"));
