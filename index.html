@@ -10,7 +10,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦊</text></svg>" />
     <link rel="manifest" href="manifest.json" />
     <title>江屿给橙子的小家</title>
-    <link rel="stylesheet" href="styles.css?v=20260627-v17" />
+    <link rel="stylesheet" href="styles.css?v=20260628-v18" />
   </head>
   <body>
     <!-- 进门密码 -->
@@ -739,14 +739,14 @@
       </div>
     </div>
 
-    <script src="app.js?v=20260627-v17"></script>
+    <script src="app.js?v=20260628-v18"></script>
     <script>
       // 强制注销所有旧 SW，再注册最新版
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(regs) {
           regs.forEach(function(r) { r.unregister(); });
         }).then(function() {
-          navigator.serviceWorker.register("sw.js?v=20260627-v17");
+          navigator.serviceWorker.register("sw.js?v=20260628-v18");
         });
       }
     </script>

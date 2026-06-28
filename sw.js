@@ -1,9 +1,9 @@
-const CACHE = "jy-home-v17";
+const CACHE = "jy-home-v18-images";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
-      cache.addAll(["./", "./index.html", "./styles.css", "./app.js", "./manifest.json"])
+      cache.addAll(["./", "./index.html", "./styles.css", "./app.js", "./manifest.json", "./assets/images/gate-sea.webp", "./assets/images/rooms/living.webp", "./assets/images/rooms/kitchen.webp", "./assets/images/rooms/study.webp", "./assets/images/rooms/bedroom.webp", "./assets/images/rooms/balcony.webp", "./assets/images/rooms/camera.webp"])
     )
   );
   self.skipWaiting();
@@ -12,7 +12,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => caches.delete(key)))
+      Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))
     )
   );
   self.clients.claim();

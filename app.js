@@ -762,12 +762,12 @@ function getRoomName(roomKey) {
 
 function getRoomImage(roomKey) {
   const defaults = {
-    living: "assets/images/rooms/living.webp",
-    kitchen: "assets/images/rooms/kitchen.webp",
-    study: "assets/images/rooms/study.webp",
-    bedroom: "assets/images/rooms/bedroom.webp",
-    balcony: "assets/images/rooms/balcony.webp",
-    camera: "assets/images/rooms/camera.webp"
+    living: "assets/images/rooms/living.webp?v=20260628",
+    kitchen: "assets/images/rooms/kitchen.webp?v=20260628",
+    study: "assets/images/rooms/study.webp?v=20260628",
+    bedroom: "assets/images/rooms/bedroom.webp?v=20260628",
+    balcony: "assets/images/rooms/balcony.webp?v=20260628",
+    camera: "assets/images/rooms/camera.webp?v=20260628"
   };
   const map = {
     living: state.config.livingImage,

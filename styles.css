@@ -78,7 +78,7 @@ button { cursor: pointer; }
   background-color: #1a3550;
   background-image:
     linear-gradient(115deg, rgba(21, 49, 76, 0.42), rgba(39, 84, 121, 0.12) 48%, rgba(216, 104, 51, 0.24)),
-    url("assets/images/gate-sea.webp");
+    url("assets/images/gate-sea.webp?v=20260628");
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
